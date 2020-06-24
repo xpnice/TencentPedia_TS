@@ -22,7 +22,7 @@
           <BookNote v-if="tab==='book'"
                     :tag="tag"
                     class="mb-n4" />
-          <LightNote v-if="tab==='light'"
+          <QA v-if="tab==='light'"
                      class="mb-n4" />
         </v-sheet>
       </v-col>
@@ -49,14 +49,14 @@
 
 <script>
 import BookNote from './BookNote.vue';
-import LightNote from './LightNote.vue';
+import QA from './QA.vue';
 import NavigateBoard from './NavigateBoard.vue';
 import RecomandBoard from './RecomandBoard.vue';
 
 export default {
   name: 'MainPage',
   components: {
-    BookNote, NavigateBoard, RecomandBoard, LightNote,
+    BookNote, NavigateBoard, RecomandBoard, QA,
   },
   data: () => ({
     tab: 'book',

@@ -20,7 +20,9 @@ module.exports = {
     "beforeStatementContinuationChars": 'off',
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'linebreak-style': ["error", "windows"],
+    //'linebreak-style': ["error", "windows"],
+    'linebreak-style':"off",
+    "no-unused-vars":'warn',
     "no-unused-expressions": 'warn',
     "no-underscore-dangle":'off'
   },

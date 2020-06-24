@@ -16,8 +16,8 @@
             </v-list-item-avatar>
 
             <v-list-item-content>
-              <v-list-item-title>{{autherinfo?this.autherinfo.author:''}}</v-list-item-title>
-              <v-list-item-subtitle>{{autherinfo?this.autherinfo.des:''}}</v-list-item-subtitle>
+              <v-list-item-title>{{autherinfo?this.autherinfo.username:'获取失败'}}</v-list-item-title>
+              <v-list-item-subtitle>{{autherinfo?this.autherinfo.des:'获取失败'}}</v-list-item-subtitle>
             </v-list-item-content>
             <v-list-item-action>
               <v-btn outlined
@@ -50,10 +50,11 @@
 /* eslint-disable import/no-unresolved */
 // eslint-disable-next-line no-unused-vars
 import Vue, { PropType } from 'vue';
-import { MockRequest } from '../../utils/request';
+import _RawHttp from '../../utils/request';
 // eslint-disable-next-line no-unused-vars
-import { QAprops } from '../../utils/constructors';
+import { QAprops, User } from '../../utils/constructors';
 
+const fetchAutherinfoURL = '/users/';
 export default Vue.extend({
   name: 'QACard',
   props: {
@@ -66,7 +67,13 @@ export default Vue.extend({
     return {
       loading: true, // 骨架框加载位
       autherinfo: {}, // 作者信息
+      isHeart: {},
     };
+  },
+  computed: {
+    isSelf() {
+      return this.$store.state.uid === this.qa.uid;
+    },
   },
   mounted() {
     this.fetchAutherinfoByUid(this.qa.uid); // 获取信息
@@ -74,13 +81,13 @@ export default Vue.extend({
   methods: {
     async fetchAutherinfoByUid(uid: number) {
       // TODO:后台接口根据uid获取用户信息
-      console.log(uid);
-      const res = await MockRequest({
-        author: 'daniel',
-        des: '真是个好人',
-      });
+      console.log('当前qa卡片的信息：', this.qa);
+      const res = await _RawHttp.get(fetchAutherinfoURL + this.$store.state.uid);
+      if (res.retcode === 0) {
+        const user:User = res.result;
+        this.autherinfo = user;
+      }
       this.loading = false;
-      this.autherinfo = res;
     },
     gotoAutherCenter() {
       console.log(`进入uid为${this.qa.uid}的个人主页`);

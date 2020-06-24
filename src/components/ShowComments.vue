@@ -3,14 +3,14 @@
 </template>
 
 <script>
-import Comments from "./Comments";
+import Comments from './Comments.vue';
 
 export default {
-  name: "ShowComments",
+  name: 'ShowComments',
   components: { Comments },
-  data () {
+  data() {
     return {
     };
-  }
+  },
 };
 </script>

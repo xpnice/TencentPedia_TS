@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const TIMEOUT = 3000;
-const BaseURL = 'http://localhost:3000';
+const BaseURL = 'http://116.62.181.32:3000';
 async function SendHttp(
   url: string,
   params: any,
@@ -43,7 +43,7 @@ async function SendHttp(
 const SHOW = true;
 
 const _RawHttp = {
-  get: (url: string, params: object):any => {
+  get: (url: string, params: object = {}):any => {
     SHOW && console.log(`GET请求 ${url}`, params);
     return SendHttp(url, params, null, 'GET', {});
   },
