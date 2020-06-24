@@ -1,32 +1,53 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+  <router-view>
+  </router-view>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+// import HelloWorld from './components/HelloWorld';
 
-#nav {
-  padding: 30px;
-}
+export default {
+  name: 'App',
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
+  components: {
 
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+  },
+
+  data: () => ({
+    dialog: false,
+    drawer: null,
+    items: [
+      { icon: 'contacts', text: 'Contacts' },
+      { icon: 'history', text: 'Frequently contacted' },
+      { icon: 'content_copy', text: 'Duplicates' },
+      {
+        icon: 'keyboard_arrow_up',
+        'icon-alt': 'keyboard_arrow_down',
+        text: 'Labels',
+        model: true,
+        children: [
+          { icon: 'add', text: 'Create label' },
+        ],
+      },
+      {
+        icon: 'keyboard_arrow_up',
+        'icon-alt': 'keyboard_arrow_down',
+        text: 'More',
+        model: false,
+        children: [
+          { text: 'Import' },
+          { text: 'Export' },
+          { text: 'Print' },
+          { text: 'Undo changes' },
+          { text: 'Other contacts' },
+        ],
+      },
+      { icon: 'settings', text: 'Settings' },
+      { icon: 'chat_bubble', text: 'Send feedback' },
+      { icon: 'help', text: 'Help' },
+      { icon: 'phonelink', text: 'App downloads' },
+      { icon: 'keyboard', text: 'Go to the old version' },
+    ],
+  })
+};
+</script>
