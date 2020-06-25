@@ -17,7 +17,6 @@
                     prepend-icon="email"
                     type="text"
                   />
-
                   <v-text-field
                     id="password"
                     v-model="loginpassword"
@@ -29,10 +28,11 @@
                 </v-form>
               </v-card-text>
               <v-card-actions>
-                <a class="ml-3" @click="maildia = !maildia;$refs.form.reset()">没有账号? 注册</a>
+                <a class="ml-3" @click="maildia = !maildia;">没有账号? 注册</a>
                 <v-spacer />
                 <v-btn
                   color="primary"
+                  :loading="loging"
                   :disabled="!loginemail||!loginpassword"
                   @click.stop="loginConfirm"
                 >Login</v-btn>
@@ -45,7 +45,7 @@
     <v-dialog v-model="maildia" width="500px">
       <v-card class="mx-auto" style="max-width: 500px;">
         <v-toolbar color="deep-purple accent-4" cards dark flat>
-          <v-btn icon>
+          <v-btn icon @click="maildia = !maildia">
             <v-icon>mdi-arrow-left</v-icon>
           </v-btn>
           <v-card-title class="title font-weight-regular">Sign up</v-card-title>
@@ -59,17 +59,10 @@
         </v-toolbar>
         <v-form ref="form" v-model="form" class="pa-4 pt-6">
           <v-text-field
-            v-model="password"
-            :rules="[rules.password, rules.length(6)]"
-            filled
-            color="deep-purple"
-            counter="6"
-            label="Password"
-            style="min-height: 96px"
-            type="password"
+            v-model="username"
+            filled color="deep-purple"
+            label="Username"
           ></v-text-field>
-          <v-text-field v-model="username" filled color="deep-purple" label="Phone number">
-          </v-text-field>
           <v-text-field
             v-model="email"
             :rules="[rules.email]"
@@ -78,21 +71,19 @@
             label="Email address"
             type="email"
           ></v-text-field>
-          <v-checkbox v-model="agreement" :rules="[rules.required]" color="deep-purple">
-            <template v-slot:label>
-              I agree to the&nbsp;
-              <a href="#" @click.stop.prevent="dialog = true">Terms of Service</a>
-              &nbsp;and&nbsp;
-              <a
-                href="#"
-                @click.stop.prevent="dialog = true"
-              >Privacy Policy</a>*
-            </template>
-          </v-checkbox>
+          <v-text-field
+            v-model="password"
+            :rules="[rules.password, rules.length(6)]"
+            filled
+            color="deep-purple"
+            counter="32"
+            label="Password"
+            style="min-height: 96px"
+            type="password"
+          ></v-text-field>
         </v-form>
         <v-divider></v-divider>
         <v-card-actions>
-          <v-btn text @click="$refs.form.reset()">Clear</v-btn>
           <v-spacer></v-spacer>
           <v-btn
             :disabled="!form"
@@ -103,24 +94,9 @@
             depressed
           >Submit</v-btn>
         </v-card-actions>
-        <v-dialog v-model="dialog" absolute max-width="400" persistent>
-          <v-card>
-            <v-card-title class="headline grey lighten-3">Legal</v-card-title>
-            <v-card-text>不同意也要同意噢</v-card-text>
-            <v-divider></v-divider>
-            <v-card-actions>
-              <v-btn text @click="agreement = false, dialog = false">No</v-btn>
-              <v-spacer></v-spacer>
-              <v-btn
-                class="white--text"
-                color="deep-purple accent-4"
-                @click="agreement = true, dialog = false"
-              >Yes</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
       </v-card>
     </v-dialog>
+    <TipBar />
   </v-app>
 </template>
 
@@ -128,25 +104,30 @@
 /* eslint-disable import/extensions */
 /* eslint-disable import/no-unresolved */
 import Vue from 'vue';
+import md5 from 'js-md5';
 import _RawHttp from '../utils/request';
 import { User } from '../utils/constructors';
+import Tip, { TipType } from '../utils/tip';
+import TipBar from '../components/components/TipBar.vue';
 
 const loginUrl = '/users/login';
-// const registerUrl = '/users/register';
+const registerUrl = '/users/register';
 
 export default Vue.extend({
   name: 'login',
   props: {
     source: String,
   },
+  components: { TipBar },
   methods: {
     async loginConfirm() {
       const { loginemail, loginpassword } = this.$data;
-      const data = { email: loginemail, password: loginpassword };
+      const data = { email: loginemail, password: md5(loginpassword) };
+      this.$data.loging = true;
       const res = await _RawHttp.post(loginUrl, data);
       if (res.retcode === 0) {
-        const user:User = res.result;
-        alert('登录成功');
+        const user: User = res.result;
+        Tip(TipType.success, '登录成功');
         this.$store.dispatch('setUid', user.uid);
         this.$router.push('/dashboard');
       } else if (res.retcode === 1) {
@@ -154,19 +135,32 @@ export default Vue.extend({
       } else {
         alert(res.result.message);
       }
+      this.loging = false;
     },
     async registerConfirm() {
-      console.log(1);
+      const { username, password, email } = this.$data;
+      const data = { username, password: md5(password), email };
+      this.$data.isLoading = true;
+      const res = await _RawHttp.post(registerUrl, data);
+      if (res.retcode === 0) {
+        Tip(TipType.success, '注册成功，请登录');
+        this.$data.loginemail = email;
+        this.maildia = false;
+      } else if (res.retcode === 1) {
+        alert(res.result);
+      } else {
+        alert(res.result.message);
+      }
+      this.$data.isLoading = true;
     },
   },
   data: () => ({
-    agreement: false,
     maildia: false,
-    dialog: false,
     email: undefined,
     loginemail: undefined,
     loginpassword: undefined,
     form: false,
+    loging: false,
     isLoading: false,
     password: undefined,
     username: undefined,
